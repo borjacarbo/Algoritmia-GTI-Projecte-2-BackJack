@@ -17,8 +17,8 @@ public class Deck : MonoBehaviour
        
     private void Awake()
     {    
-        InitCardValues();        
-
+        InitCardValues();
+        Test_InitCardValues();
     }
 
     private void Start()
@@ -29,11 +29,32 @@ public class Deck : MonoBehaviour
 
     private void InitCardValues()
     {
+        
+
         /*TODO:
          * Asignar un valor a cada una de las 52 cartas del atributo "values".
          * En principio, la posición de cada valor se deberá corresponder con la posición de faces. 
          * Por ejemplo, si en faces[1] hay un 2 de corazones, en values[1] debería haber un 2.
          */
+
+        for (int i = 0; i < 51; i++)
+        {
+            if (i % 13 == 0)
+            {
+                values[i] = 11;
+            }
+            else
+            {
+                if ((i % 13) >= 10)
+                {
+                    values[i] = 10;
+                }
+                else
+                {
+                    values[i] = (i % 13) + 1;
+                }
+            }  
+        }
     }
 
     private void ShuffleCards()
@@ -89,7 +110,7 @@ public class Deck : MonoBehaviour
     public void Hit()
     {
         /*TODO: 
-         * Si estamos en la mano inicial, debemos voltear la primera carta del dealer.
+         * Si estamos en la mano inicial, debemos voltear la primera carta del dealer cuando se plantar el jugador)
          */
         
         //Repartimos carta al jugador
@@ -126,5 +147,19 @@ public class Deck : MonoBehaviour
         ShuffleCards();
         StartGame();
     }
-    
+
+    /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Testing functionalities
+    ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+
+    private void Test_InitCardValues()
+    {
+
+        for (int i = 0; i < 51; i++)
+        {
+            Debug.Log("Carta: " + i.ToString() + " has value " + values[i].ToString());
+        }
+    }
+
+
 }
