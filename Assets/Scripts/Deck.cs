@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class Deck : MonoBehaviour
@@ -18,7 +19,7 @@ public class Deck : MonoBehaviour
     private void Awake()
     {    
         InitCardValues();
-        Test_InitCardValues();
+//        Test_InitCardValues();
     }
 
     private void Start()
@@ -30,7 +31,7 @@ public class Deck : MonoBehaviour
     private void InitCardValues()
     {
         
-
+        /* DONE */
         /*TODO:
          * Asignar un valor a cada una de las 52 cartas del atributo "values".
          * En principio, la posición de cada valor se deberá corresponder con la posición de faces. 
@@ -72,10 +73,16 @@ public class Deck : MonoBehaviour
         {
             PushPlayer();
             PushDealer();
+
+
             /*TODO:
              * Si alguno de los dos obtiene Blackjack, termina el juego y mostramos mensaje
              */
         }
+
+
+        // Test_PlayerGameWithoutShuffle_Loose(1);
+        // Test_PlayerGameWithoutShuffle_Stand(1);
     }
 
     private void CalculateProbabilities()
@@ -105,7 +112,8 @@ public class Deck : MonoBehaviour
         player.GetComponent<CardHand>().Push(faces[cardIndex], values[cardIndex]/*,cardCopy*/);
         cardIndex++;
         CalculateProbabilities();
-    }       
+
+    }
 
     public void Hit()
     {
@@ -118,7 +126,9 @@ public class Deck : MonoBehaviour
 
         /*TODO:
          * Comprobamos si el jugador ya ha perdido y mostramos mensaje
-         */      
+         */
+        // Test_PlayerGameWithoutShuffle_Loose(2);
+        // Test_PlayerGameWithoutShuffle_Stand(2);
 
     }
 
@@ -152,6 +162,8 @@ public class Deck : MonoBehaviour
     Testing functionalities
     ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
+
+
     private void Test_InitCardValues()
     {
 
@@ -162,4 +174,116 @@ public class Deck : MonoBehaviour
     }
 
 
+    private void Test_PlayerGameWithoutShuffle_Loose(int init)
+    {
+
+        int playerPoints = player.GetComponent<CardHand>().points;
+
+        if (init == 1)
+        {
+            Debug.Log("Initially Player has Points: " + playerPoints.ToString());
+            Hit();
+            Debug.Log("Player has Points: " + playerPoints.ToString());
+
+        }
+        else
+        {
+            Debug.Log("Player has Points: " + playerPoints.ToString());
+
+            if (playerPoints < 21)
+            {
+                Hit();
+            }
+            else
+            {
+                if (playerPoints == 21)
+                {
+                    Debug.Log("------ Player has won  ---------------- ");
+                }
+                else
+                {
+                    Debug.Log("------ Player has lost with " + playerPoints.ToString() + " ---------------- ");
+
+                }
+            }
+
+        }
+    }
+
+
+    private List<GameObject> cardList;
+
+    private void Test_PlayerGameWithoutShuffle_Stand(int init)
+    {
+
+        int playerPoints = player.GetComponent<CardHand>().points;
+
+        if (init == 1)
+        {
+            Debug.Log("Initially Player has Points: " + playerPoints.ToString());
+            Hit();
+            Debug.Log("Player has Points: " + playerPoints.ToString());
+
+        }
+        else
+        {
+            Debug.Log("Player has Points: " + playerPoints.ToString());
+
+            Debug.Log("going to calculate future points");
+
+            //Calculamos la puntuación previa de nuestra mano
+
+
+            Debug.Log("Next card will be  : " + values[cardIndex].ToString());
+            int valFutur = 0;
+            int aces = 0;
+            cardList = player.GetComponent<CardHand>().cards;
+            foreach (GameObject f in cardList)
+            {
+
+                if (f.GetComponent<CardModel>().value != 11)
+                    valFutur += f.GetComponent<CardModel>().value;
+                else
+                    aces++;
+            }
+
+            if (values[cardIndex] == 11)
+            {
+                aces++;
+            }
+            else
+            {
+                valFutur = valFutur + values[cardIndex];
+            }
+
+            for (int i = 0; i < aces; i++)
+            {
+                if (valFutur + 11 <= 21)
+                {
+                    valFutur = valFutur + 11;
+                }
+                else
+                {
+                    valFutur = valFutur + 1;
+                }
+            }
+
+            Debug.Log("Next points will be  : " + valFutur.ToString());
+
+            if (valFutur < 21)
+            {
+                Hit();
+            }
+            else
+            {
+                Debug.Log("------ Player stands after card : " + values[cardIndex -1]);
+
+                Debug.Log("------ Player stands with : " + playerPoints.ToString() + " points  ---------------- ");
+                Stand();
+            }
+
+        }
+
+    }
 }
+
