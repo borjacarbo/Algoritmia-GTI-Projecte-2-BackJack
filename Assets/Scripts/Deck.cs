@@ -71,13 +71,26 @@ public class Deck : MonoBehaviour
     {
         for (int i = 0; i < 2; i++)
         {
+            // Test_BlackJack(1);
+            // Test_BlackJack(2);
+
             PushPlayer();
             PushDealer();
+
 
 
             /*TODO:
              * Si alguno de los dos obtiene Blackjack, termina el juego y mostramos mensaje
              */
+
+        }
+
+
+
+        int playerPoints = player.GetComponent<CardHand>().points;
+        if (playerPoints == 21)
+        {
+            GanaPlayer(true);
         }
 
 
@@ -124,9 +137,14 @@ public class Deck : MonoBehaviour
         //Repartimos carta al jugador
         PushPlayer();
 
+        // Test_PlayerGameWithoutShuffle_Loose(2);
+        // Test_PlayerGameWithoutShuffle_Stand(2);
+
         /*TODO:
          * Comprobamos si el jugador ya ha perdido y mostramos mensaje
          */
+        GanaPlayer(true);
+
         // Test_PlayerGameWithoutShuffle_Loose(2);
         // Test_PlayerGameWithoutShuffle_Stand(2);
 
@@ -138,12 +156,45 @@ public class Deck : MonoBehaviour
          * Si estamos en la mano inicial, debemos voltear la primera carta del dealer.
          */
 
-        /*TODO:
-         * Repartimos cartas al dealer si tiene 16 puntos o menos
-         * El dealer se planta al obtener 17 puntos o más
-         * Mostramos el mensaje del que ha ganado
-         */                
-         
+        hitButton.interactable = false;
+        stickButton.interactable = false;
+
+        dealer.GetComponent<CardHand>().InitialToggle();
+        int dealerPoints = dealer.GetComponent<CardHand>().points;
+        
+        if (dealerPoints == 21)
+        {
+            GanaPlayer(false);
+        }
+        else
+        {
+            /*TODO:
+             * Repartimos cartas al dealer si tiene 16 puntos o menos
+             * El dealer se planta al obtener 17 puntos o más
+             * Mostramos el mensaje del que ha ganado
+             */
+             while (dealerPoints <= 16)
+            {
+                PushDealer();
+                dealerPoints = dealer.GetComponent<CardHand>().points;
+            }
+            if (dealerPoints > 21)
+            {
+                GanaPlayer(true);
+            }
+            else
+            {
+                if (dealer.GetComponent<CardHand>().points < player.GetComponent<CardHand>().points)
+                {
+                    GanaPlayer(true);
+                }
+                else
+                {
+                    GanaPlayer(false);
+                }
+            }
+        }
+
     }
 
     public void PlayAgain()
@@ -156,6 +207,45 @@ public class Deck : MonoBehaviour
         cardIndex = 0;
         ShuffleCards();
         StartGame();
+    }
+
+    private void GanaPlayer(bool yes)
+    {
+        if (yes)
+        {
+            int playerPoints = player.GetComponent<CardHand>().points;
+            int dealerPoints = dealer.GetComponent<CardHand>().points;
+
+            if (playerPoints > 21)
+            {
+                finalMessage.text = "------ Player has lost with " + playerPoints.ToString() + " points ------ ";
+                hitButton.interactable = false;
+                stickButton.interactable = false;
+            }
+            if (playerPoints == 21)
+            {
+                finalMessage.text = "------ CONGRATULATIONS you have WON !!!!! with " + playerPoints.ToString() + " points ------";
+                hitButton.interactable = false;
+                stickButton.interactable = false;
+            }
+        }
+        else
+        {
+            int points = dealer.GetComponent<CardHand>().points;
+
+            if (points > 21)
+            {
+                finalMessage.text = "------ Dealer has not won neither with " + points.ToString() + " points ------ ";
+                hitButton.interactable = false;
+                stickButton.interactable = false;
+            }
+            if (points == 21)
+            {
+                finalMessage.text = "      ------ SORRY dealer has WON !!!!!!!                     with " + points.ToString() + " points ------";
+                hitButton.interactable = false;
+                stickButton.interactable = false;
+            }
+        }
     }
 
     /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -283,7 +373,25 @@ public class Deck : MonoBehaviour
             }
 
         }
-
     }
+
+    
+    private void Test_BlackJack(int n)
+    {
+        if (n == 1)
+        {
+                values[2] = 10;
+        }
+        else
+        {
+                values[1] = 11;
+                values[3] = 10;
+        }
+        for (int i = 0; i < 51; i++)
+        {
+            Debug.Log("Value at index  : " + i.ToString() + " is " + values[i].ToString());
+        }
+    }
+        
 }
 
