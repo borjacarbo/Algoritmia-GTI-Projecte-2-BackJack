@@ -12,9 +12,11 @@ public class Deck : MonoBehaviour
     public Button playAgainButton;
     public Text finalMessage;
     public Text probMessage;
+
+
     private bool hit = false;
 
-    private bool testing = false;
+    private bool testing_probabilidadDe = false;
 
     public int[] values = new int[52];
     public int[] shuffledValues = new int[52];
@@ -80,71 +82,59 @@ public class Deck : MonoBehaviour
     void StartGame()
     {
 
-        int test_value = 10;
-        int test_repeat = 3;
-        Test_ProbabilidadDe(test_value, test_repeat);
+        //        int test_value = 10; int test_repeat = 3; Test_ProbabilidadDe(test_value, test_repeat);
 
+        // Test_ProbabilidadDealerTengaAlmenos(12);
+        // Test_ProbabilidadDealerTengaAlmenos(11);
+        // Test_ProbabilidadDealerTengaAlmenos(10);
+        // Test_ProbabilidadDealerTengaAlmenos(9);
+        // Test_ProbabilidadDealerTengaAlmenos(8);
+        // Test_ProbabilidadDealerTengaAlmenos(7);
+        // Test_ProbabilidadDealerTengaAlmenos(6);
+        // Test_ProbabilidadDealerTengaAlmenos(5);
+        // Test_ProbabilidadDealerTengaAlmenos(4);
+        // Test_ProbabilidadDealerTengaAlmenos(3);
+        // Test_ProbabilidadDealerTengaAlmenos(2);
+        // Test_ProbabilidadDealerTengaAlmenos(1);
 
         for (int i = 0; i < 2; i++)
         {
             // Test_BlackJack(1);
             // Test_BlackJack(2);
 
-
-
             PushPlayer();
             PushDealer();
-
-
-
-            /*TODO:
-             * Si alguno de los dos obtiene Blackjack, termina el juego y mostramos mensaje
-             */
-
         }
 
-
-
-        // distributed Cards
-        string playerString = "";
-        string dealerString = "";
-
-        for (int i = 0; i < cardIndex; i++)
+        /*TODO:
+         * Si alguno de los dos obtiene Blackjack, termina el juego y mostramos mensaje
+         */
+        int playerPoints = player.GetComponent<CardHand>().points;
+        if (playerPoints == 21)
         {
-            int par = i % 2;
-            if (par == 0)
-            {
-                playerString = playerString + shuffledValues[i].ToString() + ",      ";
-            }
-            else
-            {
-                if (i != 1)
-                {
-                    dealerString = dealerString + shuffledValues[i].ToString() + ",      ";
-                }
-            }
-        }
-        Debug.Log("--------> Player cards:      " + shuffledValues[0].ToString() + ",      " + shuffledValues[2].ToString());
-        Debug.Log("--------> Dealer card:      " + shuffledValues[3].ToString());
-        Debug.Log("--------> Invisible card " + shuffledValues[1].ToString());
-
-        if (testing)
-        {
-            ProbabilidadDe(test_value);
+            GanaDealer();
         }
         else
         {
-        CalculateProbabilities();
+            int dealerPoints = dealer.GetComponent<CardHand>().points;
+
+            if (dealerPoints == 21)
+            {
+                GanaDealer();
+            }
+
+        }
+
+        if (!testing_probabilidadDe)
+        {
+            CalculateProbabilities();
+        }
+        else
+        {
+            // ProbabilidadDe(test_value);
         }
 
 
-        /*
-                int playerPoints = player.GetComponent<CardHand>().points;
-                if (playerPoints == 21)
-                {
-                    GanaPlayer(true);
-                }
-        */
 
         // Test_PlayerGameWithoutShuffle_Loose(1);
         // Test_PlayerGameWithoutShuffle_Stand(1);
@@ -158,24 +148,19 @@ public class Deck : MonoBehaviour
          * - Probabilidad de que el jugador obtenga entre un 17 y un 21 si pide una carta
          * - Probabilidad de que el jugador obtenga más de 21 si pide una carta          
          */
-
-
         int playerPoints = player.GetComponent<CardHand>().points;
-        Debug.Log("Pleayer points : " + playerPoints.ToString());
-
         int dealerPoints = dealer.GetComponent<CardHand>().points;
-        Debug.Log("Dealer points : " + dealerPoints.ToString());
+        int dealerNeedsAtLeast = playerPoints - (dealerPoints - shuffledValues[1]) + 1;
 
-        int needed = playerPoints - (dealerPoints - shuffledValues[1]) + 1;
-        // Debug.Log("Invisible points : " + shuffledValues[1].ToString());
+        Debug.Log("Dealer needs : " + dealerNeedsAtLeast.ToString() + " ó more");
 
-        // Debug.Log("Needed : " + needed.ToString());
+        string Message = "";
 
-        // Debug.Log("cardIndex : " + cardIndex.ToString());
-
-            ProbabilidadDealerMas(needed, true);
-
-        }
+        int probabilityDealerTengaMasDe = (int)(100 * ProbabilidadDealerTengaMasDe(dealerNeedsAtLeast));
+        Message = Message + "Dealer tenga más puntos: " + probabilityDealerTengaMasDe.ToString() + " %\n";
+        Message = Message + "Conseguir entre 17 y 21 con la siguiente carta: ";
+        probMessage.text = Message;
+    }
 
     void PushDealer()
     {
@@ -217,7 +202,7 @@ public class Deck : MonoBehaviour
         /*TODO:
          * Comprobamos si el jugador ya ha perdido y mostramos mensaje
          */
-        GanaPlayer(true);
+        GanaDealer();
 
         // Test_PlayerGameWithoutShuffle_Loose(2);
         // Test_PlayerGameWithoutShuffle_Stand(2);
@@ -238,7 +223,7 @@ public class Deck : MonoBehaviour
         
         if (dealerPoints == 21)
         {
-            GanaPlayer(false);
+            GanaDealer();
         }
         else
         {
@@ -254,17 +239,17 @@ public class Deck : MonoBehaviour
             }
             if (dealerPoints > 21)
             {
-                GanaPlayer(true);
+                GanaDealer();
             }
             else
             {
                 if (dealer.GetComponent<CardHand>().points < player.GetComponent<CardHand>().points)
                 {
-                    GanaPlayer(true);
+                    GanaDealer();
                 }
                 else
                 {
-                    GanaPlayer(false);
+                    GanaDealer();
                 }
             }
         }
@@ -283,10 +268,26 @@ public class Deck : MonoBehaviour
         StartGame();
     }
 
-    private void GanaPlayer(bool yes)
+    private void GanaDealer()
     {
-        if (yes)
-        {
+            int points = dealer.GetComponent<CardHand>().points;
+
+            if (points > 21)
+            {
+                finalMessage.text = "------ Dealer has not won neither with " + points.ToString() + " points ------ ";
+                hitButton.interactable = false;
+                stickButton.interactable = false;
+            }
+            if (points == 21)
+            {
+                finalMessage.text = "      ------ SORRY dealer has WON !!!!!!!                     with " + points.ToString() + " points ------";
+                hitButton.interactable = false;
+                stickButton.interactable = false;
+            }
+    }
+
+    private void GanaPlayer()
+    {
             int playerPoints = player.GetComponent<CardHand>().points;
             int dealerPoints = dealer.GetComponent<CardHand>().points;
 
@@ -302,24 +303,42 @@ public class Deck : MonoBehaviour
                 hitButton.interactable = false;
                 stickButton.interactable = false;
             }
-        }
-        else
-        {
-            int points = dealer.GetComponent<CardHand>().points;
+    }
 
-            if (points > 21)
-            {
-                finalMessage.text = "------ Dealer has not won neither with " + points.ToString() + " points ------ ";
-                hitButton.interactable = false;
-                stickButton.interactable = false;
-            }
-            if (points == 21)
-            {
-                finalMessage.text = "      ------ SORRY dealer has WON !!!!!!!                     with " + points.ToString() + " points ------";
-                hitButton.interactable = false;
-                stickButton.interactable = false;
-            }
+
+    public float ProbabilidadDealerTengaMasDe(int dealerNeedsAtLeast)  // revisa.ho
+    {
+        float p_value = 0;
+        switch (dealerNeedsAtLeast)
+        {
+            case 1:           
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+            case 10:
+                for (int i = dealerNeedsAtLeast; i <= 10; i++)
+                {
+                    p_value = p_value + ProbabilidadDe(i);
+                }
+                p_value = p_value + ProbabilidadDe(11);
+                break;
+            case 11:
+                if (dealerNeedsAtLeast > 1)
+                {
+                    p_value = p_value + ProbabilidadDe(11);
+                }
+                break;
+            default:
+                p_value = p_value + ProbabilidadDe(dealerNeedsAtLeast);
+                break;
         }
+        Debug.Log("Probabilidad que Dealer tenga " + dealerNeedsAtLeast.ToString() + " ó mas es " + p_value.ToString());
+        return p_value;
     }
 
     public float ProbabilidadDe(int value)
@@ -345,10 +364,10 @@ public class Deck : MonoBehaviour
             inFavor = 4 - sameVisibleCards;
             potential = 52 - (cardIndex - 1);
             p_value = inFavor / potential;
-            Debug.Log("********  Cartas jugadas del mismo tipo: " + sameVisibleCards.ToString());
+            Debug.Log("********  Cartas jugadas del valor " + value.ToString() + " son " + sameVisibleCards.ToString());
             Debug.Log("********  Cartas jugadas hasta ahora: " + (cardIndex - 1).ToString());
 
-            Debug.Log("Probabilidad es " + p_value.ToString());
+            Debug.Log("Probabilidad de " + value.ToString() + " es " + p_value.ToString());
             return p_value;
         }
         else if (value == 10) // precisa una J, Q, K o As
@@ -366,10 +385,10 @@ public class Deck : MonoBehaviour
             inFavor = 12 - sameVisibleCards;
             potential = 52 - (cardIndex - 1);
             p_value = inFavor / potential;
-            Debug.Log("********  Cartas jugadas del mismo tipo: " + sameVisibleCards.ToString());
+            Debug.Log("********  Cartas jugadas del valor " + value.ToString() + " son " + sameVisibleCards.ToString());
             Debug.Log("********  Cartas jugadas hasta ahora: " + (cardIndex - 1).ToString());
 
-            Debug.Log("Probabilidad es : " + p_value.ToString());
+            Debug.Log("Probabilidad de " + value.ToString() + " es " + p_value.ToString());
             return p_value;
 
         }
@@ -388,10 +407,10 @@ public class Deck : MonoBehaviour
                 inFavor = 4 - sameVisibleCards;
             potential = 52 - (cardIndex - 1);
             p_value = inFavor / potential;
-            Debug.Log("********  Cartas jugadas del mismo tipo: " + sameVisibleCards.ToString());
+            Debug.Log("********  Cartas jugadas del valor " + value.ToString() + " son " + sameVisibleCards.ToString());
             Debug.Log("********  Cartas jugadas hasta ahora: " + (cardIndex - 1).ToString());
 
-            Debug.Log("Probabilidad es : " + p_value.ToString());
+            Debug.Log("Probabilidad de " + value.ToString() + " es " + p_value.ToString());
             return p_value;
         }
         else
@@ -403,30 +422,6 @@ public class Deck : MonoBehaviour
         }
     }
 
-    public float ProbabilidadDealerMas(int needed, bool print)  // revisa.ho
-    {
-
-        if (testing)
-        {
-            ProbabilidadDe(needed);
-            return 0;
-        }
-
-        float p_value = 0;
-        /*
-
-        // Debug.Log(">>>>>>>>>>>>>  A calcular la probabilidad de : " + needed.ToString());
-
-        p_value = ProbabilidadDe(needed);
-
-
-        if (print)
-        {
-            // probMessage.text = (p_value * 100).ToString("R") + " %";
-        }
-        */
-        return p_value;
-    }
 
     /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Testing functionalities
@@ -436,7 +431,6 @@ public class Deck : MonoBehaviour
 
     private void Test_InitCardValues()
     {
-        testing = true;
         for (int i = 0; i < 51; i++)
         {
             Debug.Log("Carta: " + i.ToString() + " has value " + shuffledValues[i].ToString());
@@ -446,7 +440,6 @@ public class Deck : MonoBehaviour
 
     private void Test_PlayerGameWithoutShuffle_Loose(int init)
     {
-        testing = true;
         int playerPoints = player.GetComponent<CardHand>().points;
 
         if (init == 1)
@@ -485,8 +478,6 @@ public class Deck : MonoBehaviour
 
     private void Test_PlayerGameWithoutShuffle_Stand(int init)
     {
-        testing = true;
-
         int playerPoints = player.GetComponent<CardHand>().points;
 
         if (init == 1)
@@ -559,7 +550,6 @@ public class Deck : MonoBehaviour
     
     private void Test_BlackJack(int n)
     {
-        testing = true;
         if (n == 1)
         {
                 shuffledValues[2] = 10;
@@ -579,8 +569,6 @@ public class Deck : MonoBehaviour
     private void Test_ProbabilidadDe(int value, int repeat)  // 
     {
         Debug.Log("test of probabilidad de " + value.ToString());
-
-        testing = true;
         switch (repeat)
         {
             case 0:
@@ -732,103 +720,136 @@ public class Deck : MonoBehaviour
         }
     }
 
-    private void Test_ProbabilidadDealerMas(int n)  // revisa-ho
+    private void Test_ProbabilidadDealerTengaAlmenos(int n)  //
     {
-        testing = true;
         switch (n)
-        { 
-            case 11: // la baraja ordenada // precisa un As
-                Debug.Log("test of probabilidad de 11");
+        {
+            case 1: // La baraja ordenada pero manipulada
+                shuffledValues[0] = 3;
+                shuffledValues[2] = 4;
+                shuffledValues[3] = 7;
+
+                Debug.Log("test of probabilidad Mas de 2");
+
+                Debug.Log("--------> Player cards:      " + shuffledValues[0].ToString() + ",      " + shuffledValues[2].ToString());
+                Debug.Log("--------> Dealer card:      " + shuffledValues[3].ToString());
+                Debug.Log("--------> Invisible card " + shuffledValues[1].ToString());
+                break;
+            case 2: // La baraja ordenada pero manipulada
+                shuffledValues[0] = 3;
+                shuffledValues[2] = 3;
+                shuffledValues[3] = 5;
+
+                Debug.Log("test of probabilidad Mas de 2");
 
                 Debug.Log("--------> Player cards:      " + shuffledValues[0].ToString() + ",      " + shuffledValues[2].ToString());
                 Debug.Log("--------> Dealer card:      " + shuffledValues[3].ToString());
                 Debug.Log("--------> Invisible card " + shuffledValues[1].ToString());
                 break;
 
-            case 10:  // La baraja ordenada pero manipulada Precisa 10 puntos más (I.e. J, Q o K)
-                shuffledValues[0] = 2;
-                shuffledValues[2] = 9;
-                shuffledValues[3] = 2;
-
-                Debug.Log("test of probabilidad de 10");
-
-                Debug.Log("--------> Player cards:      " + shuffledValues[0].ToString() + ",      " + shuffledValues[2].ToString());
-                Debug.Log("--------> Dealer card:      " + shuffledValues[3].ToString());
-                Debug.Log("--------> Invisible card " + shuffledValues[1].ToString());
-
-                break;
-            case 3: // La baraja ordenada pero manipulada Precisa sólo un punto más
+            case 3: // La baraja ordenada pero manipulada
                 shuffledValues[0] = 2;
                 shuffledValues[2] = 2;
                 shuffledValues[3] = 2;
 
-                Debug.Log("test of probabilidad de 3");
+                Debug.Log("test of probabilidad Mas de 3");
 
                 Debug.Log("--------> Player cards:      " + shuffledValues[0].ToString() + ",      " + shuffledValues[2].ToString());
                 Debug.Log("--------> Dealer card:      " + shuffledValues[3].ToString());
                 Debug.Log("--------> Invisible card " + shuffledValues[1].ToString());
                 break;
-            case 4: // La baraja ordenada pero manipulada Precisa sólo dos puntos más
+            case 4: // La baraja ordenada pero manipulada
                 shuffledValues[0] = 2;
                 shuffledValues[2] = 3;
                 shuffledValues[3] = 2;
 
-                Debug.Log("test of probabilidad de 4");
+                Debug.Log("test of probabilidad Mas de 4");
 
                 Debug.Log("--------> Player cards:      " + shuffledValues[0].ToString() + ",      " + shuffledValues[2].ToString());
                 Debug.Log("--------> Dealer card:      " + shuffledValues[3].ToString());
                 Debug.Log("--------> Invisible card " + shuffledValues[1].ToString());
                 break;
-            case 5:  // La baraja ordenada pero manipulada Precisa sólo tres puntos más
+            case 5:  // La baraja ordenada pero manipulada
                 shuffledValues[0] = 2;
                 shuffledValues[2] = 4;
                 shuffledValues[3] = 2;
 
-                Debug.Log("test of probabilidad de 5");
+                Debug.Log("test of probabilidad Mas de 5");
 
                 Debug.Log("--------> Player cards:      " + shuffledValues[0].ToString() + ",      " + shuffledValues[2].ToString());
                 Debug.Log("--------> Dealer card:      " + shuffledValues[3].ToString());
                 Debug.Log("--------> Invisible card " + shuffledValues[1].ToString());
                 break;
-            case 6: // La baraja ordenada pero manipulada Precisa sólo cuatro puntos más
+            case 6: // La baraja ordenada pero manipulada
                 shuffledValues[0] = 2;
                 shuffledValues[2] = 5;
                 shuffledValues[3] = 2;
 
-                Debug.Log("test of probabilidad de 6");
+                Debug.Log("test of probabilidad Mas de 6");
 
                 Debug.Log("--------> Player cards:      " + shuffledValues[0].ToString() + ",      " + shuffledValues[2].ToString());
                 Debug.Log("--------> Dealer card:      " + shuffledValues[3].ToString());
                 Debug.Log("--------> Invisible card " + shuffledValues[1].ToString());
                 break;
-            case 7: // La baraja ordenada pero manipulada Precisa sólo un punto más
+            case 7: // La baraja ordenada pero manipulada
                 shuffledValues[0] = 2;
                 shuffledValues[2] = 6;
                 shuffledValues[3] = 2;
 
-                Debug.Log("test of probabilidad de 7");
+                Debug.Log("test of probabilidad Mas de 7");
 
                 Debug.Log("--------> Player cards:      " + shuffledValues[0].ToString() + ",      " + shuffledValues[2].ToString());
                 Debug.Log("--------> Dealer card:      " + shuffledValues[3].ToString());
                 Debug.Log("--------> Invisible card " + shuffledValues[1].ToString());
                 break;
-            case 8: // La baraja ordenada pero manipulada Precisa sólo un punto más
+            case 8: // La baraja ordenada pero manipulada
                 shuffledValues[0] = 2;
                 shuffledValues[2] = 7;
                 shuffledValues[3] = 2;
 
-                Debug.Log("test of probabilidad de 8");
+                Debug.Log("test of probabilidad Mas de 8");
 
                 Debug.Log("--------> Player cards:      " + shuffledValues[0].ToString() + ",      " + shuffledValues[2].ToString());
                 Debug.Log("--------> Dealer card:      " + shuffledValues[3].ToString());
                 Debug.Log("--------> Invisible card " + shuffledValues[1].ToString());
                 break;
-            case 9:   // La baraja ordenada pero manipulada Precisa 9 puntos más (i.e. máximo carta normal)
+            case 9:   // La baraja ordenada pero manipulada
                 shuffledValues[0] = 2;
                 shuffledValues[2] = 8;
                 shuffledValues[3] = 2;
 
-                Debug.Log("test of probabilidad de 9");
+                Debug.Log("test of probabilidad Mas de 9");
+
+                Debug.Log("--------> Player cards:      " + shuffledValues[0].ToString() + ",      " + shuffledValues[2].ToString());
+                Debug.Log("--------> Dealer card:      " + shuffledValues[3].ToString());
+                Debug.Log("--------> Invisible card " + shuffledValues[1].ToString());
+                break;
+
+            case 10:  // La baraja ordenada pero manipulada
+                shuffledValues[0] = 2;
+                shuffledValues[2] = 9;
+                shuffledValues[3] = 2;
+
+                Debug.Log("test of probabilidad Mas de 10");
+
+                Debug.Log("--------> Player cards:      " + shuffledValues[0].ToString() + ",      " + shuffledValues[2].ToString());
+                Debug.Log("--------> Dealer card:      " + shuffledValues[3].ToString());
+                Debug.Log("--------> Invisible card " + shuffledValues[1].ToString());
+                break;
+
+            case 11: // la baraja ordenada pero No manipulada
+                Debug.Log("test of probabilidad Mas de 11");
+
+                Debug.Log("--------> Player cards:      " + shuffledValues[0].ToString() + ",      " + shuffledValues[2].ToString());
+                Debug.Log("--------> Dealer card:      " + shuffledValues[3].ToString());
+                Debug.Log("--------> Invisible card " + shuffledValues[1].ToString());
+                break;
+
+
+            case 12: // la baraja ordenada pero manipulada
+                shuffledValues[0] = 10;
+                shuffledValues[2] = 10;
+                shuffledValues[3] = 9;
 
                 Debug.Log("--------> Player cards:      " + shuffledValues[0].ToString() + ",      " + shuffledValues[2].ToString());
                 Debug.Log("--------> Dealer card:      " + shuffledValues[3].ToString());
@@ -846,7 +867,6 @@ public class Deck : MonoBehaviour
 
     private void Test_ShuffledCards()
     {
-        testing = true;
         for (int i = 0; i < 51; i++)
         {
             if (i % 13 == 0)
