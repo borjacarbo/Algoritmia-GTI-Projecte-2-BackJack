@@ -150,15 +150,28 @@ public class Deck : MonoBehaviour
          */
         int playerPoints = player.GetComponent<CardHand>().points;
         int dealerPoints = dealer.GetComponent<CardHand>().points;
-        int dealerNeedsAtLeast = playerPoints - (dealerPoints - shuffledValues[1]) + 1;
 
-        Debug.Log("Dealer needs : " + dealerNeedsAtLeast.ToString() + " ó more");
 
         string Message = "";
 
-        int probabilityDealerTengaMasDe = (int)(100 * ProbabilidadDealerTengaMasDe(dealerNeedsAtLeast));
-        Message = Message + "Dealer tenga más puntos: " + probabilityDealerTengaMasDe.ToString() + " %\n";
-        Message = Message + "Conseguir entre 17 y 21 con la siguiente carta: ";
+        Debug.Log("========== > Calculando Probabilidad que Dealer tenga mas ");
+        Debug.Log("========== > ");
+
+        int probabilityDealerTengaMasDe = (int)(100 * ProbabilidadDealerTengaMasDe(playerPoints, dealerPoints));
+        Message = Message + 
+                    "Dealer tenga más puntos: " + 
+                    probabilityDealerTengaMasDe.ToString() + 
+                    " %\n";
+
+        Debug.Log("========== > Calculando Probabilidad entre 17 y 21 ");
+        Debug.Log("========== > ");
+
+        int probabilidadConseguirEntre17y21 = (int)(100 * ProbabilidadConseguirEntre17y21(playerPoints));
+        Message = Message + 
+                    "Conseguir entre 17 y 21 con la siguiente carta: " + 
+                    probabilidadConseguirEntre17y21.ToString() + 
+                    " %\n";
+
         probMessage.text = Message;
     }
 
@@ -202,7 +215,8 @@ public class Deck : MonoBehaviour
         /*TODO:
          * Comprobamos si el jugador ya ha perdido y mostramos mensaje
          */
-        GanaDealer();
+
+            GanaPlayer();
 
         // Test_PlayerGameWithoutShuffle_Loose(2);
         // Test_PlayerGameWithoutShuffle_Stand(2);
@@ -289,7 +303,7 @@ public class Deck : MonoBehaviour
     private void GanaPlayer()
     {
             int playerPoints = player.GetComponent<CardHand>().points;
-            int dealerPoints = dealer.GetComponent<CardHand>().points;
+           // int dealerPoints = dealer.GetComponent<CardHand>().points;
 
             if (playerPoints > 21)
             {
@@ -306,8 +320,12 @@ public class Deck : MonoBehaviour
     }
 
 
-    public float ProbabilidadDealerTengaMasDe(int dealerNeedsAtLeast)  // revisa.ho
+    public float ProbabilidadDealerTengaMasDe(int playerPoints, int dealerPoints)  // revisa.ho
     {
+        int dealerNeedsAtLeast = playerPoints - (dealerPoints - shuffledValues[1]) + 1;
+
+        Debug.Log("Dealer needs : " + dealerNeedsAtLeast.ToString() + " ó more");
+
         float p_value = 0;
         switch (dealerNeedsAtLeast)
         {
@@ -339,6 +357,60 @@ public class Deck : MonoBehaviour
         }
         Debug.Log("Probabilidad que Dealer tenga " + dealerNeedsAtLeast.ToString() + " ó mas es " + p_value.ToString());
         return p_value;
+    }
+        
+    private float ProbabilidadConseguirEntre17y21(int playerPoints)
+    {
+        int minimo;
+        int maximo;
+        float probabilidad = 0;
+        switch (playerPoints)
+        {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+                probabilidad = 0;
+                break;
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+                minimo = 17 - playerPoints;
+                for (int i = minimo; i <= 11; i++)
+                {
+                    probabilidad = probabilidad + ProbabilidadDe(11);
+                }
+                break;
+            case 10:
+            case 11:
+            case 12:
+            case 13:
+            case 14:
+            case 15:
+            case 16:
+                minimo = 17 - playerPoints;
+                for(int i = minimo; i <= 4 + minimo; i++)
+                {
+                    probabilidad = probabilidad + ProbabilidadDe(i);
+                }
+                break;
+            case 17:
+            case 18:
+            case 19:
+            case 20:
+                maximo = 21 - playerPoints;
+                for (int i = 1; i <= maximo; i++)
+                {
+                    probabilidad = probabilidad + ProbabilidadDe(i);
+                }
+                break;
+            default:
+                probabilidad = 0;
+                break;
+        }
+        return probabilidad;
     }
 
     public float ProbabilidadDe(int value)
