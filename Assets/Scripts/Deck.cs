@@ -154,8 +154,8 @@ public class Deck : MonoBehaviour
 
         string Message = "";
 
-        Debug.Log("========== > Calculando Probabilidad que Dealer tenga mas ");
-        Debug.Log("========== > ");
+        Debug.Log("==================== > Calculando Probabilidad que Dealer tenga mas con player = " + playerPoints.ToString() + " puntos");
+        Debug.Log("==================== > ");
 
         int probabilityDealerTengaMasDe = (int)(100 * ProbabilidadDealerTengaMasDe(playerPoints, dealerPoints));
         Message = Message + 
@@ -163,13 +163,22 @@ public class Deck : MonoBehaviour
                     probabilityDealerTengaMasDe.ToString() + 
                     " %\n";
 
-        Debug.Log("========== > Calculando Probabilidad entre 17 y 21 ");
-        Debug.Log("========== > ");
+        Debug.Log("==================== > Calculando Probabilidad entre 17 y 21 con player = " + playerPoints.ToString() + " puntos");
+        Debug.Log("==================== > ");
 
         int probabilidadConseguirEntre17y21 = (int)(100 * ProbabilidadConseguirEntre17y21(playerPoints));
         Message = Message + 
                     "Conseguir entre 17 y 21 con la siguiente carta: " + 
                     probabilidadConseguirEntre17y21.ToString() + 
+                    " %\n";
+
+        Debug.Log("==================== > Calculando Probabilidad de pasarse con player = " + playerPoints.ToString() + " puntos");
+        Debug.Log("==================== > ");
+
+        int probabilidadDePasarse = (int)(100 * ProbabilidadDePasarse(playerPoints));
+        Message = Message +
+                    "Pasarse con la siguiente carta: " +
+                    probabilidadDePasarse.ToString() +
                     " %\n";
 
         probMessage.text = Message;
@@ -195,7 +204,6 @@ public class Deck : MonoBehaviour
         {
             CalculateProbabilities();
         }
-
     }
 
     public void Hit()
@@ -203,7 +211,6 @@ public class Deck : MonoBehaviour
         /*TODO: 
          * Si estamos en la mano inicial, debemos voltear la primera carta del dealer cuando se plantar el jugador)
          */
-
         hit = true;
         
         //Repartimos carta al jugador
@@ -413,7 +420,49 @@ public class Deck : MonoBehaviour
         return probabilidad;
     }
 
-    public float ProbabilidadDe(int value)
+    private float ProbabilidadDePasarse(int playerPoints)
+    {
+        int minimo;
+        int maximo;
+        float probabilidad = 0;
+        switch (playerPoints)
+        {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+                probabilidad = 0;
+                break;
+            case 12:
+            case 13:
+            case 14:
+            case 15:
+            case 16:
+            case 17:
+            case 18:
+            case 19:
+            case 20:
+                minimo = 22 - playerPoints;
+                for (int i = minimo; i <= 10; i++)
+                {
+                    probabilidad = probabilidad + ProbabilidadDe(i);
+                }
+                break;
+            default:
+                probabilidad = 0;
+                break;
+        }
+                return probabilidad;
+    }
+
+        public float ProbabilidadDe(int value)
     {
         int sameVisibleCards = 0;
         float p_value;
@@ -439,7 +488,7 @@ public class Deck : MonoBehaviour
             Debug.Log("********  Cartas jugadas del valor " + value.ToString() + " son " + sameVisibleCards.ToString());
             Debug.Log("********  Cartas jugadas hasta ahora: " + (cardIndex - 1).ToString());
 
-            Debug.Log("Probabilidad de " + value.ToString() + " es " + p_value.ToString());
+            Debug.Log("Probabilidad de " + value.ToString() + " es --------> " + p_value.ToString());
             return p_value;
         }
         else if (value == 10) // precisa una J, Q, K o As
@@ -460,7 +509,7 @@ public class Deck : MonoBehaviour
             Debug.Log("********  Cartas jugadas del valor " + value.ToString() + " son " + sameVisibleCards.ToString());
             Debug.Log("********  Cartas jugadas hasta ahora: " + (cardIndex - 1).ToString());
 
-            Debug.Log("Probabilidad de " + value.ToString() + " es " + p_value.ToString());
+            Debug.Log("Probabilidad de " + value.ToString() + " es --------> " + p_value.ToString());
             return p_value;
 
         }
@@ -482,7 +531,7 @@ public class Deck : MonoBehaviour
             Debug.Log("********  Cartas jugadas del valor " + value.ToString() + " son " + sameVisibleCards.ToString());
             Debug.Log("********  Cartas jugadas hasta ahora: " + (cardIndex - 1).ToString());
 
-            Debug.Log("Probabilidad de " + value.ToString() + " es " + p_value.ToString());
+            Debug.Log("Probabilidad de " + value.ToString() + " es --------> " + p_value.ToString());
             return p_value;
         }
         else
