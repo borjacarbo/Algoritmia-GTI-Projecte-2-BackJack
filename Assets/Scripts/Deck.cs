@@ -20,6 +20,8 @@ public class Deck : MonoBehaviour
 
     public int[] values = new int[52];
     public int[] shuffledValues = new int[52];
+    public int[] newIndex = new int[52];
+
 
     int cardIndex = 0;
 
@@ -37,16 +39,12 @@ public class Deck : MonoBehaviour
 
     private void InitCardValues()
     {
-
         /* DONE */
         /*TODO:
          * Asignar un valor a cada una de las 52 cartas del atributo "values".
          * En principio, la posición de cada valor se deberá corresponder con la posición de faces. 
          * Por ejemplo, si en faces[1] hay un 2 de corazones, en values[1] debería haber un 2.
          */
-
-
-
         for (int i = 0; i < 51; i++)
         {
             if (i % 13 == 0)
@@ -70,18 +68,30 @@ public class Deck : MonoBehaviour
 
     private void ShuffleCards()
     {
-        Test_ShuffledCards();
-
         /*TODO:
          * Barajar las cartas aleatoriamente.
          * El método Random.Range(0,n), devuelve un valor entre 0 y n-1
          * Si lo necesitas, puedes definir nuevos arrays.
          */
+        List<int> listNewIndexes = new List<int>();
+        int tempNewIndex;
+        for (int i = 0; i < 52; i++)
+        {
+            do
+            {
+                tempNewIndex = Random.Range(0, 52);
+            } while (listNewIndexes.Contains(tempNewIndex));
+            listNewIndexes.Add(tempNewIndex);
+            newIndex[i] = tempNewIndex;
+//            Debug.Log("Indice " + i.ToString() + " newIndex = " + newIndex[i].ToString ());
+            shuffledValues[i] = values[tempNewIndex];
+        }
+
+        //    Test_ShuffledCards();
     }
 
     void StartGame()
     {
-
         //        int test_value = 10; int test_repeat = 3; Test_ProbabilidadDe(test_value, test_repeat);
 
         // Test_ProbabilidadDealerTengaAlmenos(12);
@@ -124,7 +134,6 @@ public class Deck : MonoBehaviour
             }
 
         }
-
         if (!testing_probabilidadDe)
         {
             CalculateProbabilities();
@@ -133,9 +142,6 @@ public class Deck : MonoBehaviour
         {
             // ProbabilidadDe(test_value);
         }
-
-
-
         // Test_PlayerGameWithoutShuffle_Loose(1);
         // Test_PlayerGameWithoutShuffle_Stand(1);
     }
@@ -189,7 +195,10 @@ public class Deck : MonoBehaviour
         /*TODO:
          * Dependiendo de cómo se implemente ShuffleCards, es posible que haya que cambiar el índice.
          */
-        dealer.GetComponent<CardHand>().Push(faces[cardIndex],shuffledValues[cardIndex]);
+        dealer.GetComponent<CardHand>().Push(faces[newIndex[cardIndex]], values[newIndex[cardIndex]]);
+//        Debug.Log("----------------------- Dealer shuffledValues " + values[newIndex[cardIndex]].ToString() +
+//                " cardIndex = " + cardIndex.ToString() +
+//                " newIndex = " + newIndex[cardIndex].ToString());
         cardIndex++;        
     }
 
@@ -198,7 +207,11 @@ public class Deck : MonoBehaviour
         /*TODO:
          * Dependiendo de cómo se implemente ShuffleCards, es posible que haya que cambiar el índice.
          */
-        player.GetComponent<CardHand>().Push(faces[cardIndex], shuffledValues[cardIndex]/*,cardCopy*/);
+        player.GetComponent<CardHand>().Push(faces[newIndex[cardIndex]], values[newIndex[cardIndex]]/*,cardCopy*/);
+//        Debug.Log("----------------------- Player shuffledValues " + values[newIndex[cardIndex]].ToString() +
+//                " cardIndex = " + cardIndex.ToString() +
+//                " newIndex = " + newIndex[cardIndex].ToString());
+
         cardIndex++;
         if (hit)
         {
@@ -423,7 +436,6 @@ public class Deck : MonoBehaviour
     private float ProbabilidadDePasarse(int playerPoints)
     {
         int minimo;
-        int maximo;
         float probabilidad = 0;
         switch (playerPoints)
         {
@@ -462,7 +474,7 @@ public class Deck : MonoBehaviour
                 return probabilidad;
     }
 
-        public float ProbabilidadDe(int value)
+    public float ProbabilidadDe(int value)
     {
         int sameVisibleCards = 0;
         float p_value;
