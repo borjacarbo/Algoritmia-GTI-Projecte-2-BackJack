@@ -503,7 +503,7 @@ public class Deck : MonoBehaviour
             Debug.Log("Probabilidad de " + value.ToString() + " es --------> " + p_value.ToString());
             return p_value;
         }
-        else if (value == 10) // precisa una J, Q, K o As
+        else if (value == 10) // precisa un 10,  J, Q, K o As
         {
             for (int i = 0; i < cardIndex; i++)
             {
@@ -515,7 +515,7 @@ public class Deck : MonoBehaviour
                     }
                 }
             }
-            inFavor = 12 - sameVisibleCards;
+            inFavor = 16 - sameVisibleCards;
             potential = 52 - (cardIndex - 1);
             p_value = inFavor / potential;
             Debug.Log("********  Cartas jugadas del valor " + value.ToString() + " son " + sameVisibleCards.ToString());
